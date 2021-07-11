@@ -1,0 +1,70 @@
+<html>
+<script src="stellar-sdk.min.js"></script>
+<script src="StellarSmartSDK.js"></script>
+<script>
+    var da
+    var gnMaxMessageChars = 196
+
+    async function DoLoad() {
+        da = document.all
+        objSDK = new StellarSmartSDK("GDCG7OFMCQ2RJQ4VXVCTQRUL2BYSC7AFND6NIDHUHGC5P4IZAT6JXDZC", true)
+        await objSDK.GetMessages()
+        taCount()
+        da.idSpanXLMUSD.innerHTML = "<b><font color=maroon>XLM/USD:</font>  " + objSDK.nXLMUSD
+        console.log(objSDK.objMessages)
+    }
+
+    async function DoSendMessage() {
+        await objSDK.SendMessage(da.idTxtMessage.value)
+    }
+
+    function NoQuotesOrReturn(e) {
+        var n = window.event ? e.keyCode : e.which
+        if (n == 34 || n == 13 || n == 10) { return false }
+    }
+
+    function taCount() {
+        var nTotalTransactionCost, nTransactionFee, nToRecipient, nCharsPerOperation
+        var nLen = da.idTxtMessage.value.length
+        if (nLen > gnMaxMessageChars) {
+            da.idTxtMessage.value = da.idTxtMessage.value.substr(0, gnMaxMessageChars)
+        }
+        da.idSpanTextCounter_used.innerHTML = nLen
+        da.idSpanTextCounter_remaining.innerHTML = gnMaxMessageChars - nLen
+        if (nLen < 33) {
+            da.idSpanTransactionCost.innerHTML = "The approximate <font color=maroon><b>Transaction Cost</b></font> will be  <b>.00001 XLM</b> ($" + (.00001 * objSDK.nXLMUSD).toFixed(7) +
+                "), of which <b>0 XLM</b> is received by the <font color=navy><b>Recipient</b></font>, " +
+                "and <b>.00001 XLM</b> is a <font color=navy><b>Transaction Fee</b></font>."
+
+        } else {
+            nCharsPerOperation = (nLen - 32) / ((gnMaxMessageChars - 32) / 100)
+            nTotalTransactionCost = (.00051 * nCharsPerOperation).toFixed(5)
+            nTransactionFee = (.00001 * nCharsPerOperation).toFixed(5)
+            nToRecipient = (nTotalTransactionCost - nTransactionFee).toFixed(5)
+            da.idSpanTransactionCost.innerHTML = "The approximate <font color=maroon><b>Transaction Cost</b></font> will be  <b>" + nTotalTransactionCost + " XLM</b> ($" + (nTotalTransactionCost * objSDK.nXLMUSD).toFixed(7) +
+                "), of which <b>" + nToRecipient + " XLM</b> is received by the <font color=navy><b>Recipient</b></font>, " +
+                "and <b>" + nTransactionFee + " XLM</b> is a <font color=navy><b>Transaction Fee</b></font>."
+        }
+    }
+
+    function StringToHex2(sString) {
+        return sString.split("")
+            .map(c => c.charCodeAt(0).toString(16).padStart(2, "0"))
+            .join("");
+    }
+
+
+
+</script>
+<body onload=DoLoad()>
+    <span id=idSpanXLMUSD></span><br>
+    <textarea id=idTxtMessage style='width:1000px; height:50px; font-size:14px' onKeyPress='return NoQuotesOrReturn(event)' onkeyup="return taCount()">#1 This is a long string containing 196 text characters. #2 This is a long string containing 196 text characters. #3 This is a long string containing 196 text characters. #4: This is a long string</textarea>
+    <br>
+    <span id=idSpanTextCounter_used>0</span> characters used, <span id=idSpanTextCounter_remaining>196</span> remaining.
+    <br>
+    <span id=idSpanTransactionCost></span>
+    <br><br>
+    <input type=button value='Send Message' onClick=DoSendMessage()>
+
+</body>
+</html>
