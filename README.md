@@ -32,7 +32,8 @@ This website uses a file named StellarSmartSDK.js, which includes the following 
 
 1. **constructor(sReceiverAddress, bIsTestnet)**: 
 Call this function to create a Smart SDK object. For example: 
-var gobjSDK = await new StellarSmartSDK(gsPublicKey_Receiver, gbNetworkType_UseTestNetwork)
+
+**var gobjSDK = await new StellarSmartSDK(gsPublicKey_Receiver, gbNetworkType_UseTestNetwork)**
 
 When that object is created, the SDK calls **this.GetMessages()**, which retrieves all the **Payments** from the selected Stellar account.
 
@@ -41,7 +42,7 @@ The **GetMessages()** function then parses the Payment data nto **Messages**, wh
   b. **message**: The message that was sent.
   c. **timestamp**: The numeric epoch timestamp.
   
-Therefore, by just creating a Smart SDK object named **gobjSDK**, you will have an onject named **gobjSD.objMessages** which 
+Therefore, by just creating a Smart SDK object named **gobjSDK**, you will have an object named **gobjSD.objMessages** which 
 contains all the messages that had been sent to the selected Stellar address.
 
 2. **this.sSender_PrivateKey**:
