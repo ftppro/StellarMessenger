@@ -49,7 +49,7 @@ contains all the messages that had been sent to the selected Stellar address.
 If the **Rabet Chrome Extension** is ***not*** being used, then you must set this property with the **Private Key** of the **Message Sender Account**.
 
 3. **SendMessage(sMessage)**:
-If you called **gobjSDK.SendMessage("This is a test")**, that message would be sent from the selected **Message Sender Account**, 
+Calling **gobjSDK.SendMessage("This is a test")** will send that message from the selected **Message Sender Account**, 
 to the **Message Receiver Account** that was set in the constructor.
 If the **Rabet Chrome Extension** is being used, then the SDK will automatically sue the Stellar account selected on the **Rabet** popup.
 If the **Rabet Chrome Extension** is ***not*** being used, then the SDK will use the **this.sSender_PrivateKey** property to sign the transaction.
