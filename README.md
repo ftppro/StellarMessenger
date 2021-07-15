@@ -12,7 +12,7 @@ The transaction fee to send text on the **Main Network** is only $0.000001 per c
 
 ### Message Sender Account
 There are two ways to select a Stellar account that messages will be sent ***from***:
-1. **Private Key:** After entering your **Private Key** for a Stellar Account, click **[Select Message Sender Account]**, and the **Balance** for that account will be shown. When you 
+1. **Private Key:** After entering your **Private Key** for a Stellar Account, click **[Select Message Sender Account]**, and the **Balance** for that account will be shown. 
 This website will then automatically **sign** the transaction when you click **[Send Message]**.
 For the **Message Sender Account**, you should only use a ***new**** Stellar account with just **1.5 XLM** (which is the **1 XLM** minimum balance, plus **.5 XLM** to send messages). 
 2. [**Rabet Chrome Extension**](https://chrome.google.com/webstore/detail/rabet/hgmoaheomcjnaheggkfafnjilfcefbmo): This **Chrome Extension** lets you select a Stellar Account without disclosing your **Private Key**. When you click **[Send Message]**, you will be prompted to **sign** the transaction on the **Rabet popup**.
