@@ -44,10 +44,10 @@ The **GetMessages()** function then parses the Payment data nto **Messages**, wh
 Therefore, by just creating a Smart SDK object named **gobjSDK**, you will have an onject named **gobjSD.objMessages** which 
 contains all the messages that had been sent to the selected Stellar address.
 
-2. **this.sSender_PrivateKey**
+2. **this.sSender_PrivateKey**:
 If the **Rabet Chrome Extension** is ***not*** being used, then you must set this property with the **Private Key** of the **Message Sender Account**.
 
-3. **SendMessage(sMessage)**
+3. **SendMessage(sMessage)**:
 If you called **gobjSDK.SendMessage("This is a test")**, that message would be sent from the selected **Message Sender Account**, 
 to the **Message Receiver Account** that was set in the constructor.
 If the **Rabet Chrome Extension** is being used, then the SDK will automatically **this.sSenderAddress** to the Stellar account selected on the **Rabet** popup.
