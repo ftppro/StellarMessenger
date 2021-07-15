@@ -31,7 +31,7 @@ When you click **[Send Message**], if you are using **Rabet** you will be prompt
 This website uses a file named StellarSmartSDK.js, which includes the following javascript functions and properties:
 
 1. **constructor(sReceiverAddress, bIsTestnet)**: 
-You may call this function to create a Smart SDK object. For example: 
+Call this function to create a Smart SDK object. For example: 
 var gobjSDK = await new StellarSmartSDK(gsPublicKey_Receiver, gbNetworkType_UseTestNetwork)
 
 When that object is created, the SDK calls **this.GetMessages()**, which retrieves all the **Payments** from the selected Stellar account.
