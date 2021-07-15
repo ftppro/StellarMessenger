@@ -20,6 +20,6 @@ You should only use a ***new*** Stellar account with just **1.5 XLM** (which is 
 ### Message Receiver Account
 The ***default*** **Message Receiver Account** is initially active when this website is opened. This account contains different sample messages for the **Main Network** and **Test Network**.
 
-You can enter your own Stellar address in the **Message Receiver Account** textbox. You should only use a ***new*** Stellar account, with a starting balance of just **1 XLM**.
+You can enter your own Stellar address in the **Message Receiver Account** textbox, and click **[Change Message Receiver Account]**. You should only use a ***new*** Stellar account, with a starting balance of just **1 XLM**.
 
 
