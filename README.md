@@ -36,7 +36,7 @@ Call this function to create a Smart SDK object. For example:<br>
 
 When that object is created, the SDK calls its **GetMessages()** function, which retrieves all the **Payments** from the selected Stellar account.
 
-The **GetMessages()** function then parses the Payment data into **Messages**, which are placed into an object array named **this.objMessages** which contains the following fields:
+The **GetMessages()** function then parses the Payment data into **Messages**, which are placed into an object array named **objMessages** which contains the following fields:
   * a. **from**: The Stellar address that sent the message.
   * b. **message**: The message that was sent.
   * c. **timestamp**: The numeric epoch timestamp.
