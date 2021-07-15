@@ -45,7 +45,8 @@ Therefore, by just creating a Smart SDK object named **gobjSDK**, you will have 
 contains all the messages that had been sent to the selected Stellar address.
 
 2. **sSender_PrivateKey**:<br>
-If the **Rabet Chrome Extension** is ***not*** being used, then you must set this ***property*** with the **Private Key** of the **Message Sender Account**.<br>
+If the **Rabet Chrome Extension** is ***not*** being used, then you must set this ***property*** with the **Private Key** of the **Message Sender Account**,
+before sending a message.<br>
 For example: **gobjSDK.objMessages.sSender_PrivateKey = 'SBKRL3MNTPWERC7788JOAIIOUIBTN55FDOD3JGYTR99QHIQDRFBIJY'**
 
 3. **SendMessage(sMessage)**:<br>
