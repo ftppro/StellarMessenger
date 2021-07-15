@@ -11,7 +11,7 @@ This website allows up to 20 retries for a transaction to be sent. On the **Test
 The transaction fee to send text on the **Main Network** is only $0.000001 per character, so you can send 16k of text (100 messages with 164 characters each) for a fee of just 2 cents.
 
 ### Message Sender Account
-There are two ways to select a Stellar account htat messages will be sent ***from***:
+There are two ways to select a Stellar account that messages will be sent ***from***:
 1. **Private Key:** After entering your **Private Key** for a Stellar Account, click **[Select Message Sender Account]**, and the **Balance** for that account will be shown. When you 
 This website will then automatically **sign** the transaction when you click **[Send Message]**.
 For the **Message Sender Account**, you should only use a ***new**** Stellar account with just **1.5 XLM** (which is the **1 XLM** minimum balance, plus **.5 XLM** to send messages). 
