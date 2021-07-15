@@ -30,7 +30,7 @@ When you click **[Send Message**], if you are using **Rabet** you will be prompt
 ### Stellar Smart SDK
 This website uses a file named StellarSmartSDK.js, which includes the following javascript functions and properties:
 
-1. **constructor**(sReceiverAddress, bIsTestnet) 
+1. **constructor(sReceiverAddress, bIsTestnet)**: 
 You may call this function to create a Smart SDK object. For example: 
 var gobjSDK = await new StellarSmartSDK(gsPublicKey_Receiver, gbNetworkType_UseTestNetwork)
 
