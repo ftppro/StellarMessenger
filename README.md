@@ -42,7 +42,7 @@ The **GetMessages()** function then parses the Payment data nto **Messages**, wh
   * b. **message**: The message that was sent.
   * c. **timestamp**: The numeric epoch timestamp.
   
-Therefore, by just creating a Smart SDK object named **gobjSDK**, you will have an object named **gobjSD.objMessages** which 
+Therefore, by just creating a Smart SDK object named **gobjSDK**, you will have an object named **gobjSDK.objMessages** which 
 contains all the messages that had been sent to the selected Stellar address.
 
 2. **this.sSender_PrivateKey**:
