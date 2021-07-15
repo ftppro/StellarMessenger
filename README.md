@@ -26,7 +26,7 @@ You can enter any valid Stellar address in the **Message Receiver Account** text
 
 After you have selected a **Message Sender Account** (by entering a **Private Key**, or by using the **Rabet Chrome Extension**), you may enter a **Message** that contains up to 164 characters. As you are typing, the display will show the **Transaction Cost**, how much will be received by the **Recipient**, and the **Transaction Fee**.
 
-When you click **[Send Message**], if you are using **Rabet** you will be prompted to **sign** the transaction on the **Rabet popup**. If you instead entered your **Private Key**, then this website will then automatically **sign** the transaction.
+When you click **[Send Message**], if you are using **Rabet** you will be prompted to **sign** the transaction on the **Rabet popup**. If you instead entered your **Private Key**, then this website will automatically **sign** the transaction.
 
 
 
