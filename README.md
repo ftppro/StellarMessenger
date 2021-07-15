@@ -50,7 +50,8 @@ before sending a message.<br>
 *For example:* **gobjSDK.objMessages.sSender_PrivateKey = 'SBKRL3MNTPWERC7788JOAIIOUIBTN55FDOD3JGYTR99QHIQDRFBIJY'**
 
 3. **SendMessage(sMessage)**:<br>
-Calling **gobjSDK.SendMessage("This is a test")** will send that message from the selected **Message Sender Account**, 
+*For example:* **gobjSDK.SendMessage("This is a test")**<br>
+This function will send at message from the selected **Message Sender Account**, 
 to the **Message Receiver Account** that was set in the constructor.
 If the **Rabet Chrome Extension** is being used, then the SDK will automatically use the Stellar account selected on the **Rabet** popup.
 If the **Rabet Chrome Extension** is ***not*** being used, then the SDK will use the **this.sSender_PrivateKey** property to sign the transaction.
