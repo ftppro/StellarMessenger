@@ -8,7 +8,7 @@ The checkbox on the upper-left corner of the page lets you use the **Test Networ
 
 This website allows up to 20 retries for a transaction to be sent. On the **Test Network**, the most retries I encountered was **6**, which took about 60 seconds to send one transaction.
 
-The transaction fee to send text on the **Main Network** is only $0.000001 per character, so you can send **16k of text** (100 messages with 164 characters each) for a fee of just **2 cents**.
+The **transaction fee** to send text on the **Main Network** is only $0.000001 per character (the rest of the **transaction cost** is sent to the **Receiver**), so you can send **16k of text** (100 messages with 164 characters each) for a fee of just **2 cents**.
 
 ### Message Sender Account
 There are two ways to select a Stellar account that messages will be sent ***from***:
