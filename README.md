@@ -61,7 +61,7 @@ If the **Rabet Chrome Extension** is ***not*** being used, then the SDK will use
 The **Stellar Smart SDK** uses ***Micro-payments*** to send up to 164 text characters in each transaction.
 
 Each Stellar transaction may contain up to 100 **Operations**, and each **Operation** may contain a **Payment**. 
-This SDK combines the **last 4 digits** of all the Payment **Amounts**, to create a **long number** that can represent **text**.
+This SDK combines the **last 4 digits** of all the Payment **Amounts**, to create a **Long Number** that can represent **text**.
 
 For example, the string "**abc**" can be converted to the following ***bytes32/hex***: **0x616263**<br>
 (You can confirm this at https://web3-type-converter.onbrn.com)
