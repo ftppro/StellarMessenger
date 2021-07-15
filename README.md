@@ -54,7 +54,7 @@ to the **Message Receiver Account** that was set in the constructor.
 If the **Rabet Chrome Extension** is being used, then the SDK will automatically use the Stellar account selected on the **Rabet** popup.
 If the **Rabet Chrome Extension** is ***not*** being used, then the SDK will use the **this.sSender_PrivateKey** property to sign the transaction.
 
-### Micro-payments send Text
+### Micro-payments as Text
 
 The **Stellar Smart SDK** uses ***Micro-payments*** to send up to 164 text characters in each transaction.
 
