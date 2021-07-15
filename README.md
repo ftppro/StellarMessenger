@@ -41,8 +41,8 @@ The **GetMessages()** function then parses the Payment data nto **Messages**, wh
   b. **message**: The message that was sent.
   c. **timestamp**: The numeric epoch timestamp.
   
-Therefore, by just creating a Smart SDK object named gobjSDK, you will have an onject named **gobjSD.objMessages ** which 
-contains all the message that had been sent to the selected Stellar address.
+Therefore, by just creating a Smart SDK object named **gobjSDK**, you will have an onject named **gobjSD.objMessages** which 
+contains all the messages that had been sent to the selected Stellar address.
 
 2. **this.sSender_PrivateKey**
 If the **Rabet Chrome Extension** is ***not*** being used, then you must set this property with the **Private Key** of the **Message Sender Account**.
