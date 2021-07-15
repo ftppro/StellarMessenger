@@ -61,7 +61,7 @@ The **Stellar Smart SDK** uses ***Micro-payments*** to send up to 164 text chara
 Each Stellar transaction may contain up to 100 **Operations**, and each **Operation** may contain a **Payment**. 
 This SDK combines the **last 4 digits** of all the Payment **Amounts**, to create a **long number** that can represent **text**.
 
-For example, the string "**abc**" can be converted to the following "**bytes32/hex**": 0x616263
+For example, the string "**abc**" can be converted to the following "**bytes32/hex**": 0x616263<br>
 (You can confirm this at https://web3-type-converter.onbrn.com)
 
 The Hex string **0x616263** can be converted to this Long Number: **6382179**
