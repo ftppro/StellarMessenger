@@ -28,7 +28,7 @@ After you have selected a **Message Sender Account** (by entering a **Private Ke
 When you click **[Send Message**], if you are using **Rabet** you will be prompted to **sign** the transaction on the **Rabet popup**. If you instead entered your **Private Key**, then the **Stellar Smart SDK** will automatically **sign** the transaction.
 
 ### Stellar Smart SDK
-This website uses a file named StellarSmartSDK.js, which includes the following javascript functions and properties:
+The **Stellar Smart SDK** is contained in a file named **StellarSmartSDK.js**, which includes the following javascript functions and properties:
 
 1. **constructor(sReceiverAddress, bIsTestnet)**: 
 Call this function to create a Smart SDK object. For example: 
