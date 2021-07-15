@@ -34,7 +34,7 @@ The **Stellar Smart SDK** is contained in a file named **StellarSmartSDK.js**, w
 Call this function to create a Smart SDK object. For example:<br>
 **var gobjSDK = await new StellarSmartSDK(gsPublicKey_Receiver, gbNetworkType_UseTestNetwork)**
 
-When that object is created, the SDK calls **this.GetMessages()**, which retrieves all the **Payments** from the selected Stellar account.
+When that object is created, the SDK calls its **.GetMessages()** function, which retrieves all the **Payments** from the selected Stellar account.
 
 The **GetMessages()** function then parses the Payment data nto **Messages**, which are placed into an object array named **this.objMessages** which contains the following fields:
   * a. **from**: The Stellar address that sent the message.
