@@ -23,10 +23,34 @@ The ***default*** **Message Receiver Account** is initially active when this web
 You can enter any valid Stellar address in the **Message Receiver Account** textbox, and click **[Change Message Receiver Account]**. You should only use a ***new*** Stellar account, with a starting balance of just **1 XLM**.
 
 ### Send Message
-
 After you have selected a **Message Sender Account** (by entering a **Private Key**, or by using the **Rabet Chrome Extension**), you may enter a **Message** that contains up to 164 characters. As you are typing, the display will show the **Transaction Cost**, how much will be received by the **Recipient**, and the **Transaction Fee**.
 
 When you click **[Send Message**], if you are using **Rabet** you will be prompted to **sign** the transaction on the **Rabet popup**. If you instead entered your **Private Key**, then this website will automatically **sign** the transaction.
 
+###Stellar Smart SDK
+This website uses a file named StellarSmartSDK.js, which contains the following javascript functions and properties:
+
+1. **constructor**(sReceiverAddress, bIsTestnet) 
+You may call this function to create a Smart SDK object. For example: 
+var gobjSDK = await new StellarSmartSDK(gsPublicKey_Receiver, gbNetworkType_UseTestNetwork)
+
+When that object is created, the SDK calls **this.GetMessages()**, which retrieves all the **Payments** from the selected Stellar account.
+
+The **GetMessages()** function then parses the Payment data nto **Messages**, which are placed into an object array named **this.objMessages** which contains the following fields:
+  a. **from**: The Stellar address that sent the message
+  b. **message**: The message that was sent.
+  c. **timestamp**: The numeric epoch timestamp.
+  
+Therefore, by just creating a Smart SDK object named gobjSDK, you will have an onject named **gobjSD.objMessages ** which 
+contains all the message that had been sent to the selected Stellar address.
+
+2. **this.sSender_PrivateKey**
+If the **Rabet Chrome Extension** is ***not*** being used, then you must set this property with the **Private Key** of the **Message Sender Account**.
+
+3. **SendMessage(sMessage)**
+If you called **gobjSDK.SendMessage("This is a test")**, that message would be sent from the selected **Message Sender Account**, 
+to the **Message Receiver Account** that was set in the constructor.
+If the **Rabet Chrome Extension** is being used, then the SDK will automatically **this.sSenderAddress** to the Stellar account selected on the **Rabet** popup.
+If the **Rabet Chrome Extension** is ***not*** being used, then the SDK will use the **this.sSender_PrivateKey** tosign the transaction.
 
 
