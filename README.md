@@ -3,12 +3,18 @@ Send **164 text characters** in one Stellar transaction, for just **.051 XLM** (
 
 Previously, the **Memo** field was the only way to include text with your payment. The Memo field only allows 32 characters per transaction, so it would take 6 transactions to send 164 characters. It takes 6 seconds to send each transaction to the Stellar blockchain, so it would take 42 seconds to do what this website does in just 1 second. This website uses **micro-payments** to send the text (this is described below).
 
-### Use on Test Network or Main Network:
+### Use on Test Network or Main Network
 The checkbox on the upper-left corner of the page lets you use the **Test Network**, which is free to use. However, the **Test Network** can be ten times slower than the **Main Network**, because it often requires multiple **retries** to send a transaction. When using the **Main Network**. I have not encountered ***any*** retries. 
 
 This website allows up to 20 retries for a transaction to be sent. On the **Test Network**, the most retries I encountered is **6**, which took about 60 seconds to send one transaction.
 
 The transaction fee to send text on the **Main Network** is only $0.000001 per character, so you can send 16k of text (100 messages with 164 characters each) for a fee of just 2 cents.
 
-###Message Sender Account:### 
+### Message Sender Account
+There are two ways to select a Stellar account htat messages will be sent ***from***:
+1. **Private Key:** After entering your **Private Key** for a Stellar Account, click [Select Message Sender Account], and the **Balance** for that account will be shown. When you 
+This website will then automatically **sign** the transaction when you click **[Send Message]**.
+For the **Message Sender Account**, you should only use a ***new**** Stellar account with just **1.5 XLM** (which is the **1 XLM** minimum balance, plus **.5 XLM** to send messages). 
+2. **[Rabet Chrome Extension]**(https://chrome.google.com/webstore/detail/rabet/hgmoaheomcjnaheggkfafnjilfcefbmo): This extension allows you to select a Stellar Account without disclosing your **Private Key**. When you click **[Send Message]**, the transaction will be **signed** on the Rabet popup.
+
 
