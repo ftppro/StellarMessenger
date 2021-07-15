@@ -18,7 +18,7 @@ You should only use a ***new*** Stellar account with just **1.5 XLM** (which is 
 2. [**Rabet Chrome Extension**](https://chrome.google.com/webstore/detail/rabet/hgmoaheomcjnaheggkfafnjilfcefbmo): This **Chrome Extension** lets you select a Stellar Account without disclosing your **Private Key**. When you click **[Send Message]**, you will be prompted to **sign** the transaction on the **Rabet popup**.
 
 ### Message Receiver Account
-The ***default*** **Message Receiver Account** is initially used when this website is opened. This account contains dfferent sample messages when the **Main Network** or **Test Network** are selected.
+The ***default*** **Message Receiver Account** is initially used when this website is opened. This account contains dfferent sample messages when the **Main Network** or **Test Network** is selected.
 
 You can enter your own Stellar address in the **Message Receiver Account** textbox. You should only use a ***new*** Stellar account, with a starting balance of just **1 XLM**.
 
