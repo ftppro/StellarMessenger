@@ -32,7 +32,7 @@ The **Stellar Smart SDK** is contained in a file named **StellarSmartSDK.js**, w
 
 1. **constructor(sReceiverAddress, bIsTestnet)**:<br> 
 Call this function to create a Smart SDK object.<br>
-*For example:* **var gobjSDK = await new StellarSmartSDK(gsPublicKey_Receiver, gbNetworkType_UseTestNetwork)**
+*For example:* **var gobjSDK = await new StellarSmartSDK('GDEWWXY4Q545486YYZMBUZMATGHYN6FLLV3G44EAX7AB5HIPFTUMBOW', true)**
 
 When that object is created, the SDK calls its **GetMessages()** function, which retrieves all the **Payments** from the selected Stellar account.
 
@@ -51,7 +51,7 @@ before sending a message.<br>
 
 3. **SendMessage(sMessage)**:<br>
 *For example:* **gobjSDK.SendMessage("This is a test")**<br>
-This function will send at message from the selected **Message Sender Account**, 
+This function will send a message from the selected **Message Sender Account**, 
 to the **Message Receiver Account** that was set in the constructor.
 If the **Rabet Chrome Extension** is being used, then the SDK will automatically use the Stellar account selected on the **Rabet** popup.
 If the **Rabet Chrome Extension** is ***not*** being used, then the SDK will use the **this.sSender_PrivateKey** property to sign the transaction.
