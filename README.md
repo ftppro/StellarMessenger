@@ -53,4 +53,3 @@ to the **Message Receiver Account** that was set in the constructor.
 If the **Rabet Chrome Extension** is being used, then the SDK will automatically **this.sSenderAddress** to the Stellar account selected on the **Rabet** popup.
 If the **Rabet Chrome Extension** is ***not*** being used, then the SDK will use the **this.sSender_PrivateKey** tosign the transaction.
 
-
