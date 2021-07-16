@@ -1,89 +1,122 @@
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// The Stellar Smart SDK is licensed under the Attribution-NonCommercial 4.0 International (CC BY-NC 4.0), as described here: https://creativecommons.org/licenses/by-nc/4.0/
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 class StellarSmartSDK {
-    constructor(sPublicAddress, bIsTestnet) {
-        this.sPublicAddress = sPublicAddress;
-        this.bIsTestnet = bIsTestnet;
-        if (bIsTestnet) {
-            this.sTestnet_Horizon = "-testnet"
-            this.objTestnet_NetworkPassphrase = StellarSdk.Networks.TESTNET
-        } else {
-            this.sTestnet_Horizon = ""
-            this.objTestnet_NetworkPassphrase = StellarSdk.Networks.PUBLIC
-        }
-        this.objMessages = []
-        this.nXLMUSD = 0
+    constructor(sReceiverAddress, bIsTestnet) {
+        return (async () => {
+            this.sReceiverAddress = sReceiverAddress;
+            this.bIsTestnet = bIsTestnet;
+            if (bIsTestnet) {
+                this.sTestnet_Horizon = "-testnet"
+                this.objTestnet_NetworkPassphrase = StellarSdk.Networks.TESTNET
+                this.sTestnet_RabetNetwork = "testnet"
+                this.sTestnet_Stellarexpert = "testnet"
+                this.sTestnet_Steexp = "testnet."
+                this.sTestnet_Description = "Test"
+            } else {
+                this.sTestnet_Horizon = ""
+                this.objTestnet_NetworkPassphrase = StellarSdk.Networks.PUBLIC
+                this.sTestnet_RabetNetwork = "mainnet"
+                this.sTestnet_Stellarexpert = "public"
+                this.sTestnet_Steexp = ""
+                this.sTestnet_Description = "Main"
+            }
+            this.objMessages = []
+            this.nXLMUSD = 0
+            this.sSenderAddress = await GetRabetSenderAddress()
+            await this.GetMessages()
+            this.sSender_PrivateKey = ""
+            return this;
+        })();
     }
 
     async SendMessage(sMessage) {
-        var sMemoHex, sMemoText, sExtraDigits, nIndex1, nTemp, nLastSequenceDigitCount, sourceAccount, objCurrentAccount, objServer, objDocumentPair, objTransaction, nMemoPayment
+        var sExtraDigits, nIndex1, nTemp, nLastSequenceDigitCount, objSenderAccount, objCurrentAccount, objServer, objDocumentPair, objTransaction, bSubmitGood, objRabetResult
         var arrExtraPayments = []
-        if (sMessage.length < 33) {
-            sMemoText = sMessage.padEnd(32, ' ')
-            nMemoPayment = .0000001
-        } else {
-            sMemoText = sMessage.substr(0, 32)
-            sExtraDigits = BigInt('0x' + StringToHex(sMessage.substr(32))).toString()
 
-            for (nIndex1 = 0; nIndex1 < sExtraDigits.length; nIndex1 += 4) {
-                nTemp = parseFloat((parseInt(sExtraDigits.substr(nIndex1, 4)) / 10000000).toFixed(7))
-                if (nTemp == 0) {
-                    nTemp = .001
-                }
-                arrExtraPayments.push(nTemp)
-            }
-            nLastSequenceDigitCount = sExtraDigits.length % 4;
-            if (nLastSequenceDigitCount == 4) {
-                nLastSequenceDigitCount = 4;
-            }
-            arrExtraPayments.push(parseFloat((nLastSequenceDigitCount / 10000000).toFixed(7)))
-            nMemoPayment = arrExtraPayments[0]
+        sMessage = sMessage.replaceAll('^', '~').replaceAll('"', '^')
+
+        this.sSenderAddress = await GetRabetSenderAddress()
+        if (!window.rabet) {
+            objDocumentPair = StellarSdk.Keypair.fromSecret(this.sSenderAddress_Secret)
+            this.sSenderAddress = objDocumentPair.publicKey()
         }
-        sMemoHex = StringToHex(sMemoText)
-////////////////////////////////////
-// Create Stellar Transaction START
-// Send from Act. #1 to Act #7
-////////////////////////////////////
+
+        sExtraDigits = BigInt('0x' + StringToHex(sMessage)).toString()
+
+        for (nIndex1 = 0; nIndex1 < sExtraDigits.length; nIndex1 += 4) {
+            nTemp = parseFloat((parseInt(sExtraDigits.substr(nIndex1, 4)) / 10000000).toFixed(7))
+            if (nTemp == 0) {
+                nTemp = .001
+            }
+            arrExtraPayments.push(nTemp)
+        }
+        nLastSequenceDigitCount = sExtraDigits.length % 4;
+        if (nLastSequenceDigitCount == 0) {
+            nLastSequenceDigitCount = 4;
+        }
+        arrExtraPayments.push(parseFloat((nLastSequenceDigitCount / 10000000).toFixed(7)))
+
+        ////////////////////////////////////
+        // Create Stellar Transaction START
+        ////////////////////////////////////
         objServer = new StellarSdk.Server("https://horizon" + this.sTestnet_Horizon + ".stellar.org");
-        objDocumentPair = StellarSdk.Keypair.fromSecret("SBKRL3HTGTWJMENJD2WJOAIIOUIBTN55FDOD3J7LFMIVLQHIQDRFBIJY")
 
-	    objCurrentAccount = await objServer.loadAccount(objDocumentPair.publicKey())
-        sourceAccount = new StellarSdk.Account(objDocumentPair.publicKey(), objCurrentAccount.sequence)
+        objCurrentAccount = await objServer.loadAccount(this.sSenderAddress)
+        objSenderAccount = new StellarSdk.Account(this.sSenderAddress, objCurrentAccount.sequence)
 
-        var objMemo = new StellarSdk.Memo(StellarSdk.MemoHash, sMemoHex)
-	    objTransaction = new StellarSdk.TransactionBuilder(sourceAccount, {
-    		fee: "100",
+        objTransaction = new StellarSdk.TransactionBuilder(objSenderAccount, {
+            fee: "100",
             networkPassphrase: this.objTestnet_NetworkPassphrase,
-            memo: objMemo
         })
-       
-        objTransaction = objTransaction.addOperation(
-			StellarSdk.Operation.payment({
-            destination: this.sPublicAddress,
-			asset: StellarSdk.Asset.native(),
-            amount: nMemoPayment.toString(),
-			}),
-		)
 
-        for (nIndex1 = 1; nIndex1 < arrExtraPayments.length; nIndex1++) {
+        for (nIndex1 = 0; nIndex1 < arrExtraPayments.length; nIndex1++) {
             objTransaction = objTransaction.addOperation(
                 StellarSdk.Operation.payment({
-                    destination: this.sPublicAddress,
+                    destination: this.sReceiverAddress,
                     asset: StellarSdk.Asset.native(),
                     amount: arrExtraPayments[nIndex1].toString(),
                 }),
             )
-
         }
         objTransaction = objTransaction.setTimeout(1000000)
         objTransaction = objTransaction.build();
-        await objTransaction.sign(objDocumentPair);
-        await objServer.submitTransaction(objTransaction)
 
-////////////////////////////////////
-// Create Stellar Transaction END
-////////////////////////////////////
+        if (window.rabet) {
+            var objXDRdata = objTransaction.toEnvelope().toXDR().toString("base64")
+            objRabetResult = await window.rabet.sign(objXDRdata, this.sTestnet_RabetNetwork)
+            objTransaction = new StellarSdk.Transaction(objRabetResult.xdr, this.objTestnet_NetworkPassphrase);
+        } else {
+            await objTransaction.sign(objDocumentPair);
+        }
 
-
-        console.log("SUCCESS: Transaction submitted OK.")
+        bSubmitGood = false
+        if (!await DoTrySubmitTransaction(objServer, objTransaction)) {
+            for (var i = 1; i < 21; i++) {
+                if (typeof (da.idSpanModalMessage) != 'undefined') {
+                    da.idSpanModalMessage.innerHTML = "<font style='font-weight:normal'><font color=maroon><b>Network Congestion:</b></font> Program will wait 5 seconds, and retry a maximum of 20 times. " +
+                        "This is Retry #" + i + ". <font color=maroon><b>The Main Network requires much fewer Retries.</b></font></font>"
+                }
+                await new Promise(resolve => setTimeout(resolve, 5000));
+                bSubmitGood = await DoTrySubmitTransaction(objServer, objTransaction)
+                if (bSubmitGood) {
+                    break;
+                }
+            }
+            if (!bSubmitGood) {
+                alert("ERROR: The Transaction was not completed.");
+                return
+            }
+        }
+        ////////////////////////////////////
+        // Create Stellar Transaction END
+        ////////////////////////////////////
+        if (typeof (da.idSpanModalMessage) != 'undefined') {
+            da.idSpanModalMessage.innerHTML = "Loading Messages, please wait ..."
+        }
+        await this.GetMessages()
     }
 
     async GetMessages() {
@@ -95,26 +128,29 @@ class StellarSmartSDK {
         var arrMessages = []
         var sMessage, sEncodedDigits, objFetchResponse, objResult, nIndex1, nIndex2, sURL, sFinalMessage, sLastPayment_amount, nLastPayment_digits, sTemp
 
+        this.objMessages = []
         // Get XLM_USD
         objFetchResponse = await fetch('https://api.pro.coinbase.com/products/XLM-USD/ticker');
         objResult = await objFetchResponse.json()
         this.nXLMUSD = parseFloat(objResult.price)
 
-        sURL = "https://horizon" + this.sTestnet_Horizon + ".stellar.org/accounts/" + this.sPublicAddress + "/operations?limit=" + cnRecordsPerSearch + "&join=transactions"
+        sURL = "https://horizon" + this.sTestnet_Horizon + ".stellar.org/accounts/" + this.sReceiverAddress + "/operations?limit=" + cnRecordsPerSearch
 
         var objRetrievedPayments = []
+
         while (nRecordsFound == cnRecordsPerSearch) {
-            //var objResult = JSON.parse(await makeRequest("GET", sURL));
-            objFetchResponse = await fetch(sURL);
-            objResult = await objFetchResponse.json()
-
-            var aobjRecords = objResult._embedded.records
+            try {
+                objFetchResponse = await fetch(sURL);
+                objResult = await objFetchResponse.json()
+                var aobjRecords = objResult._embedded.records
+            }
+            catch (e) {
+                break
+            }
             for (var i = 0; i < aobjRecords.length; i++) {
-                if (aobjRecords[i].transaction.memo_type == "hash" && aobjRecords[i].transaction_successful == true && aobjRecords[i].type == "payment" && aobjRecords[i].asset_type == "native" && aobjRecords[i].to == this.sPublicAddress) {
-
+                if (aobjRecords[i].transaction_successful == true && aobjRecords[i].type == "payment" && aobjRecords[i].asset_type == "native" && aobjRecords[i].to == this.sReceiverAddress) {
                     objRetrievedPayments.push({
-                        "created_at": aobjRecords[i].created_at, "from": aobjRecords[i].from, "amount": aobjRecords[i].amount, "memo": atob(aobjRecords[i].transaction.memo), "transaction_hash": aobjRecords[i].transaction_hash,
-                        "epoch": new Date(Date.parse(aobjRecords[i].created_at)).getTime() / 1000
+                        "from": aobjRecords[i].from, "amount": aobjRecords[i].amount, "transaction_hash": aobjRecords[i].transaction_hash, "timestamp": new Date(Date.parse(aobjRecords[i].created_at)).getTime() / 1000
                     })
                     arrTransactionHashes_all.push(aobjRecords[i].transaction_hash)
                 }
@@ -130,48 +166,26 @@ class StellarSmartSDK {
             objPaymentsForOneTransaction = objRetrievedPayments.filter(function (el) {
                 return el.transaction_hash == arrTransactionHashes_unique[nIndex1]
             });
-            if (objPaymentsForOneTransaction.length < 2) {
-                sFinalMessage = objPaymentsForOneTransaction[0].memo.trim()
-            } else {
+            if (objPaymentsForOneTransaction.length > 1) {
                 sEncodedDigits = ""
                 for (nIndex2 = 0; nIndex2 < objPaymentsForOneTransaction.length - 2; nIndex2++) {
                     sTemp = Math.round(objPaymentsForOneTransaction[nIndex2].amount * 10000000).toString()
                     sEncodedDigits += sTemp.padStart(4, '0')
-/*
-                    // DEVTEST
-                    if (nIndex1 == 4) {
-                        console.log(arrTransactionHashes_unique[nIndex1])
-                        console.log(objPaymentsForOneTransaction[nIndex2].amount)
-                        console.log(sTemp)
-                        console.log(sEncodedDigits)
-                    }
-*/
                 }
 
                 sLastPayment_amount = Math.round(objPaymentsForOneTransaction[objPaymentsForOneTransaction.length - 2].amount * 10000000).toString()
                 nLastPayment_digits = Math.round(objPaymentsForOneTransaction[objPaymentsForOneTransaction.length - 1].amount * 10000000)
                 sEncodedDigits += sLastPayment_amount.padStart(nLastPayment_digits, '0')
-                sFinalMessage = objPaymentsForOneTransaction[0].memo + HexToString(dec2hex(sEncodedDigits))
+                sFinalMessage = HexToString(dec2hex(sEncodedDigits))
+                this.objMessages.push({
+                    "from": objPaymentsForOneTransaction[0].from,   
+                    "message": sFinalMessage,
+                    "timestamp": objPaymentsForOneTransaction[0].timestamp
+                })
             }
-            this.objMessages.push({"created_at": objPaymentsForOneTransaction[0].created_at, "from": objPaymentsForOneTransaction[0].from,
-                "message": sFinalMessage,
-                "epoch": objPaymentsForOneTransaction[0].epoch
-            })
         }
-        this.objMessages.sort((a, b) => (a.epoch < b.epoch) ? 1 : ((b.epoch < a.epoch) ? -1 : 0))
+        this.objMessages.sort((a, b) => (a.timestamp < b.timestamp) ? 1 : ((b.timestamp < a.timestamp) ? -1 : 0))
     }
-}
-
-function GetRandomID() {
-    var sRandomID = "";
-    for (var nIndex = 0; nIndex < 6; nIndex++) {
-        nRandom = Math.floor(Math.random() * 52) + 65;
-        if (nRandom > 90) {
-            nRandom += 6;
-        }
-        sRandomID += String.fromCharCode(nRandom)
-    }
-    return sRandomID
 }
 
 function dec2hex(str) {
@@ -201,4 +215,23 @@ function HexToString(sEncodedHex) {
         .filter(p => !!p)
         .map(c => String.fromCharCode(parseInt(c, 16)))
         .join("")
+}
+
+async function DoTrySubmitTransaction(objServer, objTransaction) {
+    try {
+        await objServer.submitTransaction(objTransaction)
+        return true
+    }
+    catch (e) {
+        return false
+    }
+}
+
+async function GetRabetSenderAddress() {
+    if (window.rabet) {
+        var objRabet = await window.rabet.connect()
+        return objRabet.publicKey
+    } else {
+        return ""
+    }
 }
