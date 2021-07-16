@@ -76,5 +76,6 @@ The Hex string **0x616263** can be converted to this ***Long Number***: **638217
 Therefore, the string "**abc**" can be stored on the Stellar network as these two **Payment Amounts**:
 * .0006382
 * .0000179
-
+* 
+This SDK does not use the **Memo** field to store text, because it is **five times slower** to retrieve records from the **Horizon API** when "***&join=transactions***" is added to the URL that retrieves **Operations**.
 
