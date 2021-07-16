@@ -22,8 +22,9 @@ The ***default*** **Message Receiver Account** is initially active when this web
 
 You can enter any valid Stellar address in the **Message Receiver Account** textbox, and click **[Change Message Receiver Account]**. You should only use a ***new*** Stellar account, with a starting balance of just **1 XLM**.
 
-You may also include the **Receiver Account Address** in the URL which displays this website. Just add "**?id=**", followed by a valid Stellar Address.<br>
-*For example:* ?id=GBDFCHPU4EWWS3UALFCIDWYMR6V4ENMOXR3KJDHK7W5BEQHD5QQA7X56&t=1
+You may also include the **Receiver Account Address** in the URL which displays this website. Just add "**?id=**", followed by a valid Stellar Address.
+To have the **Test Network** used, add "**&t=1** at the end of the URL.<br>
+*For example:* https://ftppro.github.io/StellarMessenger?id=GBDFCHPU4EWWS3UALFCIDWYMR6V4ENMOXR3KJDHK7W5BEQHD5QQA7X56&t=1
 
 ### Send Message
 After you have selected a **Message Sender Account** (by entering a **Private Key**, or by using the **Rabet Chrome Extension**), you may enter a **Message** that contains up to 164 characters. As you are typing, the display will show the **Transaction Cost**, how much will be received by the **Recipient**, and the **Transaction Fee**.
