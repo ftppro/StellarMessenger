@@ -1,0 +1,459 @@
+<html><head>
+    <title>Stellar Messenger</title>
+    <META name=description content="Send 164 text characters in one Stellar transaction, for just .051 XLM (about 1 cent). Uses the Stellar Smart SDK, which can be used to create Shopping Carts, Tweets, and Discussion Forums on the Stellar blockchain.">
+    <META name=keywords content="Stellar Messenger, Stellar, Messenger, Stellar SDK">
+
+    <script src="stellar-sdk.min.js"></script>
+    <script src="StellarSmartSDK.js"></script>
+    <script>
+        var da, gsPublicKey_Receiver, gbNetworkType_UseTestNetwork, gobjSDK, gnMessageSenderBalance
+        var gnMaxMessageChars = 164
+        var gsDefaultReceiverAddress = "GBSWSQ36XIFVTT33T6DILHLSLYK6MKFFDFDOJD2QFZHA2CD6G3PRI75Y"
+
+        async function DoLoad() {
+            var bParm_UseTestnet
+            da = document.all
+            gbNetworkType_UseTestNetwork = true
+            gsPublicKey_Receiver = gsDefaultReceiverAddress
+
+            var objURLParams = new URLSearchParams(window.location.search);
+            var sParam_id = objURLParams.get('id');
+            if (sParam_id) {
+
+                if (objURLParams.get('t')) {
+                    bParm_UseTestnet = true
+                } else {
+                    bParm_UseTestnet = false
+                }
+                if (await DoConfirmValidAccount(sParam_id, bParm_UseTestnet)) {
+                    gsPublicKey_Receiver = sParam_id
+                    gbNetworkType_UseTestNetwork = bParm_UseTestnet
+                }
+            }
+
+            if (gbNetworkType_UseTestNetwork) {
+                da.idChkUseTestnet.checked = true
+            }
+
+            da.idSpanModalMessage.innerHTML = "Loading Messages, please wait ..."
+            da.divOverlay_Modal.style.display = 'block';
+            gobjSDK = await new StellarSmartSDK(gsPublicKey_Receiver, gbNetworkType_UseTestNetwork)
+            if (window.rabet && gobjSDK.sSenderAddress != '') {
+                da.idDivSendMessage.style.display = 'inline'
+                await DoShowMessageSenderBalance()
+                if (!(gnMessageSenderBalance > 1)) {
+                    da.idSpanMessageSenderBalance.innerHTML = "<font color=red><b>This is not an active Stellar Account on the <font color=green>" + gobjSDK.sTestnet_Description + " Network</font>.</b>"
+                }
+
+                da.idDivMessageSenderAccount.style.display = 'inline'
+            }
+            da.idDivMessageSenderAccount.style.display = 'inline'
+
+            taCount()
+            da.idSpanXLMUSD.innerHTML = gobjSDK.nXLMUSD
+            da.idTxtMessageReceiver.value = gsPublicKey_Receiver
+            DoShowMessagesGrid()
+            da.divOverlay_Modal.style.display = 'none'
+        }
+
+        async function DoShowMessageSenderBalance() {
+            var nIndex = 0
+            gnMessageSenderBalance = 0
+            try {
+                if (window.rabet) {
+                    da.idDivMessageSenderAccount.innerHTML = "On <b>Rabet</b>, you selected this <font color=maroon><b>Message Sender Account</b></font>: " +
+                        "<a class=bluelink target=_sfs href=https://" + gobjSDK.sTestnet_Steexp + "steexp.com/account/" +
+                        gobjSDK.sSenderAddress + ">" + gobjSDK.sSenderAddress.substr(0, 12) + "..</a> <span id=idSpanMessageSenderBalance></span>"
+                    da.idDivSendMessage.style.display = 'inline'
+                }
+                var sURL = "https://horizon" + gobjSDK.sTestnet_Horizon + ".stellar.org/accounts/" + gobjSDK.sSenderAddress
+                var objFetchResponse = await fetch(sURL);
+                var objResult = await objFetchResponse.json()
+                for (nIndex1 = 0; nIndex1 < objResult.balances.length; nIndex1++) {
+                    if (objResult.balances[nIndex1].asset_type == "native") {
+                        gnMessageSenderBalance = parseFloat(objResult.balances[nIndex1].balance)
+                        break
+                    }
+                }
+                da.idSpanMessageSenderBalance.innerHTML = "<b>Balance:</b> " + gnMessageSenderBalance.toFixed(4)
+            }
+            catch (e) {
+                gobjSDK.sSenderAddress_Secret = ""
+                //gobjSDK.sSenderAddress = ""
+                da.idSpanMessageSenderBalance.innerHTML = ""
+                da.idDivSendMessage.style.display = "none"
+            }
+        }
+
+        async function DoChangeMessageReceiver() {
+            if (da.idTxtMessageReceiver.value == "") {
+                alert("Please enter the Message Receiver Account Address.")
+                return
+            }
+            if (await DoConfirmValidAccount(da.idTxtMessageReceiver.value, da.idChkUseTestnet.checked)) {
+                gsPublicKey_Receiver = da.idTxtMessageReceiver.value
+                DoChangeTestNetworkCheckbox()
+            } else {
+                da.idTxtMessageReceiver.value = gsPublicKey_Receiver
+            }
+        }
+
+        async function DoConfirmValidAccount(sReceiverAddress, bUseTestnet) {
+            try {
+                var sTestNet_Horizon = ""
+                var sTestNet_description = "Main"
+                if (bUseTestnet) {
+                    sTestNet_Horizon = "-testnet"
+                    sTestNet_description = "Test"
+                }
+                var sURL = "https://horizon" + sTestNet_Horizon + ".stellar.org/accounts/" + sReceiverAddress
+                var objFetchResponse = await fetch(sURL);
+                var objResult = await objFetchResponse.json()
+                var nBalance = parseFloat(objResult.balances[0].balance)
+                if (nBalance >= 1) {
+                    return true
+                }
+            }
+            catch (e) {
+            }
+            alert("This Message Receiver Account is not an active Stellar Account on the " + sTestNet_description + " Network.")
+            return false
+        }
+
+        async function DoSelectMessageSenderPrivateKey() {
+            var objMessageSenderPair, objResult, objFetchResponse, sPrivateKey
+            if (da.idTxtMessageSenderPrivateKey.value == "") {
+                alert("Please enter the Private Key of your Message Sender Account.")
+                return
+            }
+            da.idSpanMessageSenderBalance.innerHTML = ""
+            try {
+                sPrivateKey = da.idTxtMessageSenderPrivateKey.value
+                objMessageSenderPair = StellarSdk.Keypair.fromSecret(sPrivateKey)
+                gobjSDK.sSenderAddress_Secret = sPrivateKey
+                gobjSDK.sSenderAddress = objMessageSenderPair.publicKey()
+
+                await DoShowMessageSenderBalance()
+                if (!(gnMessageSenderBalance > 1)) {
+                    da.idSpanMessageSenderBalance.innerHTML = "<font color=red><b>This is not an active Account on the <font color=green>" + gobjSDK.sTestnet_Description + " Network</font>.</b>"
+                } else {
+                    da.idDivSendMessage.style.display = "inline"
+                }
+            }
+            catch (e) {
+                gobjSDK.sSenderAddress_Secret = ""
+                //gobjSDK.sSenderAddress = ""
+                da.idSpanMessageSenderBalance.innerHTML = ""
+                da.idDivSendMessage.style.display = "none"
+                alert("Invalid Private Key")
+            }
+        }
+
+        function AlphaNumeric(e) {
+            var n = window.event ? e.keyCode : e.which
+            if (!((n >= 65 && n <= 90) || (n >= 48 && n <= 57) || (n >= 97 && n <= 122) || n == 0 || n == 8 || n == 95)) { return false }
+        }
+
+        async function DoSendMessage() {
+            da.idSpanModalMessage.innerHTML = "Sending Message on Stellar Network (to Receiver Account), please wait ..."
+            da.divOverlay_Modal.style.display = 'block';
+
+            await gobjSDK.SendMessage(da.idTxtMessage.value)
+            DoShowMessagesGrid()
+            da.divOverlay_Modal.style.display = 'none'
+        }
+
+        function NoReturnChars(e) {
+            var n = window.event ? e.keyCode : e.which
+            if (n == 94 || n == 13 || n == 10) { return false }
+        }
+
+        function taCount() {
+            var nTotalTransactionCost, nTransactionFee, nToRecipient, nCharsPerOperation
+            var nLen = da.idTxtMessage.value.length
+            if (nLen > gnMaxMessageChars) {
+                da.idTxtMessage.value = da.idTxtMessage.value.substr(0, gnMaxMessageChars)
+                nLen = da.idTxtMessage.value.length
+            }
+            da.idSpanTextCounter_used.innerHTML = nLen
+            da.idSpanTextCounter_remaining.innerHTML = gnMaxMessageChars - nLen
+            nCharsPerOperation = nLen / (gnMaxMessageChars / 100)
+            nTotalTransactionCost = (.00051 * nCharsPerOperation).toFixed(5)
+            nTransactionFee = (.00001 * nCharsPerOperation).toFixed(5)
+            nToRecipient = (nTotalTransactionCost - nTransactionFee).toFixed(5)
+            da.idSpanTransactionCost.innerHTML = "The approximate <font color=maroon><b>Transaction Cost</b></font> will be  <b>" + nTotalTransactionCost + " XLM</b> ($" + (nTotalTransactionCost * gobjSDK.nXLMUSD).toFixed(7) +
+                "), of which <b>" + nToRecipient + " XLM</b> is received by the <font color=navy><b>Recipient</b></font>, " +
+                "and <b>" + nTransactionFee + " XLM</b> is a <font color=navy><b>Transaction Fee</b></font>."
+        }
+
+        function StringToHex2(sString) {
+            return sString.split("")
+                .map(c => c.charCodeAt(0).toString(16).padStart(2, "0"))
+                .join("");
+        }
+
+        function DoShowMessagesGrid() {
+            var objNewRow
+            while (da.idTbody_MessagesData.hasChildNodes()) {
+                da.idTbody_MessagesData.removeChild(da.idTbody_MessagesData.lastChild);
+            }
+            for (var i = 0; i < gobjSDK.objMessages.length; i++) {
+                objNewRow = da.idTbody_MessagesData.insertRow()
+                objNewRow.insertCell()
+                objNewRow.insertCell()
+                objNewRow.insertCell()
+                objNewRow.cells.item(0).style.width = 180
+                objNewRow.cells.item(1).style.width = 120
+                objNewRow.cells.item(2).style.width = 1230
+                objNewRow.cells.item(0).innerHTML = new Date(gobjSDK.objMessages[i].timestamp * 1000).toLocaleString()
+                objNewRow.cells.item(1).innerHTML = "<a class=bluelink target=_sfs href=https://stellar.expert/explorer/" +
+                    gobjSDK.sTestnet_Stellarexpert + "/account/" + gobjSDK.objMessages[i].from + ">" + gobjSDK.objMessages[i].from.substr(0, 10) + "..</a>"
+                objNewRow.cells.item(2).innerHTML = gobjSDK.objMessages[i].message.replaceAll('^', '"').replaceAll('~', '^')
+            }
+            da.idDivMessagesGrid.style.display = 'inline'
+        }
+
+        async function DoChangeTestNetworkCheckbox() {
+            if (!(await DoConfirmValidAccount(gsPublicKey_Receiver, da.idChkUseTestnet.checked, true))) {
+                if (da.idChkUseTestnet.checked) {
+                    da.idChkUseTestnet.checked = false
+                } else {
+                    da.idChkUseTestnet.checked = true
+                }
+            } else {
+                da.idSpanModalMessage.innerHTML = "Loading Messages, please wait ..."
+                da.divOverlay_Modal.style.display = 'block';
+                gbNetworkType_UseTestNetwork = da.idChkUseTestnet.checked
+
+                var sOldSenderAddress = gobjSDK.sSenderAddress
+                var sSenderAddress_Secret = gobjSDK.sSenderAddress_Secret
+                gobjSDK = await new StellarSmartSDK(gsPublicKey_Receiver, gbNetworkType_UseTestNetwork)
+
+                if (!window.rabet) {
+                    gobjSDK.sSenderAddress = sOldSenderAddress
+                    gobjSDK.sSenderAddress_Secret = sSenderAddress_Secret
+                }
+                await gobjSDK.GetMessages()
+                DoShowMessagesGrid()
+                await DoShowMessageSenderBalance()
+
+                if (!(gnMessageSenderBalance > 1)) {
+                    da.idSpanMessageSenderBalance.innerHTML = "<font color=red><b>This is not an active Account on the <font color=green>" + gobjSDK.sTestnet_Description + " Network</font>.</b>"
+                } else {
+                    da.idDivSendMessage.style.display = 'inline'
+                }
+                da.divOverlay_Modal.style.display = 'none'
+            }
+        }
+    </script>
+    <style>
+        body, td, file, input {
+            font-family: verdana;
+            font-size: 14px
+        }
+
+        A.bluelink {
+            color: blue
+        }
+
+            A.bluelink:hover {
+                color: red
+            }
+
+        A.whitebig {
+            color: white;
+            font-size: 24px
+        }
+
+            A.whitebig:hover {
+                color: yellow
+            }
+
+        A.white {
+            color: white;
+            font-size: 15px
+        }
+
+            A.white:hover {
+                color: yellow
+            }
+
+        table.clsMessagesTable tbody, table.clsMessagesTable thead {
+            display: block
+        }
+
+        table.clsMessagesTable tbody {
+            overflow: auto
+        }
+
+        table.clsMessagesTable td {
+            font-weight: normal;
+            font-size: 13px
+        }
+
+        .clsCenter {
+            margin: 0;
+            position: absolute;
+            top: 50%;
+            -ms-transform: translateY(-50%);
+            transform: translateY(-50%);
+            width: 100%;
+        }
+
+        .clsModal_main {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            padding-top: 0px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .clsModal_sub {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 1px;
+            border: 1px solid #888;
+            width: 1590px;
+            height: 740px;
+            position: relative;
+            background: #d0ffff
+        }
+    </style>
+</head>
+<body bgcolor=#ffffff topmargin=0 leftmargin=0 rightmargin=0 marginwidth=0 marginheight=0 onLoad=DoLoad()>
+    <table cellspacing=0 cellpadding=0 width=100% align=center>
+        <tr bgcolor=maroon>
+            <td>
+                <font style='font-size:4px'><br></font>
+                <table cellspacing=0 cellpadding=0 width=1590 align=center>
+                    <tr>
+                        <td width=38% valign=middle>
+                            <input type=checkbox id=idChkUseTestnet name=chkUseTestnet style='transform: scale(1.5)' onChange=DoChangeTestNetworkCheckbox()> <font style='color:yellow; font-size:16px'><b>Use Test Network</b></font> <font style='font-size:13px; color:lime'> <b>&nbsp;Main Net is 10x faster, for just pennies.</b></font>
+                        </td>
+                        <td width=24% align=center valign=middle>
+                            <a style='text-decoration: none;' href=/ class=whitebig><b>Stellar Messenger</b></a> <font style='font-size:18px;color:white'>v1.0</font>
+                        </td>
+                        <td width=18% valign=middle align=center><b><font color=white>XLM/USD: </font><font color=aqua>$<span id=idSpanXLMUSD></span></font></b></td>
+
+                        <td width=20% valign=middle align=right>
+                            <a target=_sfs2 href=https://github.com/ftppro/StellarMessenger class=white>Help</a>&nbsp;&nbsp;
+                            <a target=_sfs2 href=https://www.TokenUp.app/FormMailz.php class=white>Contact us</a>&nbsp;&nbsp;
+                            <a target=_sfs2 href=https://www.TokenUp.app/policies_StellarMessenger.php class=white>Terms of use</a>
+                        </td>
+                    </tr>
+                </table>
+                <font style='font-size:4px'><br></font>
+            </td>
+        </tr>
+
+        <tr bgcolor=#ffffff>
+            <td valign=top>
+                <!-- Sub Table Body START -->
+                <table cellspacing=0 cellpadding=0 width=1590 align=center>
+                    <tr>
+                        <td>
+                            <font style='font-size:6px'><br></font>
+                            <table width=98% align=center>
+                                <tr>
+                                    <td>
+                                        Send <b>164 text characters</b> in one transaction, for just <b>.051 XLM</b> (about <b>1 cent</b>). 
+                                        The recipient receives <b>.05 XLM</b>, so your transaction fee is only <b>.001 XLM.</b> <font color=green><b>You can send 16k of text for a fee of just 2 cents!</b></font>
+                                        <br>
+                                        This increased text size will allow <b>Shopping Carts</b>, <b>Tweets</b>, and <b>Discussion Forums</b> to be created on the Stellar blockchain for the first time.
+                                        <br>
+                                        Experiment by sending a message to the default <font color=maroon><b>Message Receiver Account</b></font>. 
+                                        Then enter <b>your</b> Stellar address in the <font color=maroon><b>Message Receiver Account</b></font> textbox. 
+                                        <i>Only use a <b>new</b> Stellar account, with just 1 XLM.</i>
+                                        <br>
+                                        The  <a class=bluelink target=_sfs href=https://github.com/ftppro/StellarMessenger><b>Github page</b></a> provides a complete description of all the features, and the <b>open-source files</b> that make it work, 
+                                        including the <font color=green><b>Stellar Smart SDK.</b></font>
+                                    </td>
+                                </tr>
+                            </table>
+                            <br>
+                            <table width=100% border=1 cellspacing=0 bgcolor=#f0ffff cellpadding=5>
+                                <tr>
+                                    <td>
+
+                                        <div id=idDivMessageSenderAccount style='display:none'>
+                                            <font style='font-size:12px'>
+                                            If you don't want to enter your <b>Private Key</b>, 
+                                            install the <a class=bluelink target=_sfs href=https://chrome.google.com/webstore/detail/rabet/hgmoaheomcjnaheggkfafnjilfcefbmo><b>Rabet Chrome Extension</b></a> to select your Stellar account. 
+                                            Otherwise, use a <b>new</b> Stellar account with only <b>1.5</b> XLM (which is the <b>1 XLM</b> minimum balance, plus <b>.5</b> XLM to send messages).</font><br>
+                                                <b>Private Key</b> of your <b><font color=maroon>Message Sender Account</font>:</b>
+                                            <input onclick='this.select()' type=text id=idTxtMessageSenderPrivateKey style='width:550px; font-size:12px; background:#ffe0ff' onKeyPress='return AlphaNumeric(event)'>
+                                            <input type=button value='Select Message Sender Account' onClick=DoSelectMessageSenderPrivateKey() style='font-size:14px;font-weight:bold;background:navy;color:white'>
+                                            <span id=idSpanMessageSenderBalance></span>
+                                        </div>
+
+                                        <br><br>
+                                        <div id=idDivSendMessage style='display:none'>
+                                            <table cellspacing=0 cellpadding=0 width=100%>
+                                                <tr>
+                                                    <td>
+                                                        <font color=green><b>Your Message:&nbsp;</b></font>
+                                                    </td>
+                                                    <td>
+                                                        <input type=text id=idTxtMessage style='width:1450px; font-size:14px; font-family:monospace; background:#ffffe0' onKeyPress='return NoReturnChars(event)' onkeyup="return taCount()">
+                                                    </td>
+                                                </tr>
+                                                
+                                                <tr>
+                                                    <td></td>
+                                                        <td>
+                                                            <b><span id=idSpanTextCounter_used>0</span></b> characters used,
+                                                            <b><span id=idSpanTextCounter_remaining>164</span></b> remaining.
+                                                            <font style='font-size:13px'><span id=idSpanTransactionCost></span></font>
+                                                        </td>
+                                                </tr>   
+                                            </table>
+                                            <input type=button value='Send Message' onClick=DoSendMessage() style='font-weight:bold;background:maroon; color:white'>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                            <br>
+                            <div id=idDivMessagesGrid    style='display:none'>
+                                <font style='font-size:6px'><br></font>
+                                <font color=maroon><b>Message Receiver Account:</b></font>
+                                <input onclick='this.select()' type=text id=idTxtMessageReceiver style='width:550px; font-size:12px; background:#ffe0ff' onKeyPress='return AlphaNumeric(event)'>
+                                <input type=button value='Change Message Receiver Account' onClick=DoChangeMessageReceiver() style='font-size:14px;font-weight:bold;background:navy;color:white'>
+
+                                <table class=clsMessagesTable border=1 cellspacing=0 cellpadding=5 align=center width=100%>
+                                    <thead style='background:black;color:white;font-size:12px'>
+                                        <tr>
+                                            <th width=180px>Date/Time</th>
+                                            <th width=120px>Stellar Address</th>
+                                            <th width=1230px>Message</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id=idTbody_MessagesData style='height:400px'></tbody>
+                                </table>
+                            </div>
+
+
+                        </td>
+                    </tr>
+                </table>
+                <!-- Sub Table Body END -->
+            </td>
+        </tr>
+    </table>
+    <!-- divOverlay_Modal START -->
+    <div id=divOverlay_Modal class=clsModal_main>
+        <div id=divOverlaySub_Modal class=clsModal_sub>
+            <div class=clsCenter>
+                <center><b><span id=idSpanModalMessage></span></b></center>
+            </div>
+        </div>
+    </div>
+    <!-- divOverlay_Modal END -->
+
+</body>
+</html>
